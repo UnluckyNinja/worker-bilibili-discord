@@ -59,7 +59,7 @@ export function buildMessage(message: MessageInfo): EmbedObject {
 // https://discord.com/developers/docs/resources/webhook#execute-webhook
 export async function pushMessagesToDiscord(messages: MessageInfo[], webhooks: string, atRoles: boolean = false) {
   const list = webhooks.split(',')
-  const embeds = messages.slice(0, 10).map(it=> buildMessage(it))
+  const embeds = messages.slice(0, 10).map(it=> buildMessage(it)).reverse() // Discord消息时间序是下为新
   const payload: WebhookPayload = {
     embeds,
     allowed_mentions: {
