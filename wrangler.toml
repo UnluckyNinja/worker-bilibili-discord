@@ -1,0 +1,14 @@
+name = "worker-bilibili-discord"
+main = "src/index.ts"
+compatibility_date = "2022-09-25"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "795fae2b23434581b8ac882f8832dc45"
+preview_id = "bf50af9272b549dd8c7e3acb47fd41a3"
+
+[triggers]
+crons = ["* * * * *"]
+
+# comma separated discord webhooks
+# - DISCORD_WEBHOOK
