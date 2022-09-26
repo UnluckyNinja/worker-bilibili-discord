@@ -1,6 +1,6 @@
 # Worker-Bilibili-Discord
 
-部署在Cloudflare上，定时抓取B站动态并推送到Discord中
+部署在Cloudflare Worker上，定时抓取特定用户的B站动态并推送到Discord中
 
 ## 安装
 
@@ -19,6 +19,8 @@ npx wrangler login
 ```
 
 然后修改`wrangler.toml`中的name为你想要的名称，会显示在Cloudflare的Dashboard中。并把KV namespace ID为你自己的，直接去Dashboard创建即可，preview_id 为 dev 模式下使用可删除
+
+如果不要求每分钟爬取，可修改`crons`为想要的模式，例如`"*/15 * * * *"`，是15分钟一次，详细设置请查阅官方文档
 
 再到`src/user.config.ts`中修改为你自己想要的配置：
 
