@@ -12,7 +12,7 @@
 
 import { Router } from 'itty-router';
 import { pushMessagesToDiscord } from './messages';
-import { fetchMessageList, onScheduled } from './triggers';
+import { fetchMessageList, MessageInfo, onScheduled } from './triggers';
 
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -44,6 +44,12 @@ export default {
   //   router
   //     .get('/__test_fetch', async () => Response.json(await fetchMessageList()))
   //     .get('/__test_env', async () => Response.json(env))
+  //     .get('/__test_kv', async () => {
+  //       const list = JSON.stringify(await fetchMessageList())
+  //       await env.KV.put('feed', list)
+  //       const value = await env.KV.get<MessageInfo[]>('feed', 'json')
+  //       return Response.json(list+'\n'+value)
+  //     })
   //     .get('/__test_discord', async () => {
   //       const list = await fetchMessageList()
   //       await pushMessagesToDiscord(list, env.DISCORD_WEBHOOK, false)

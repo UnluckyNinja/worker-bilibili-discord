@@ -145,15 +145,15 @@ export function filterNewMessages(list: MessageInfo[], last: MessageInfo[]): Mes
 export async function onScheduled(_env: Env) {
   env = _env
 
-  const updateKV = (list: MessageInfo[]) => {
-    env.KV.put('feed', JSON.stringify(list))
+  const updateKV = async (list: MessageInfo[]) => {
+    await env.KV.put('feed', JSON.stringify(list))
   }
 
   const list = await fetchMessageList()
   const last = await env.KV.get<MessageInfo[]>('feed', 'json')
   if (!last) {
     // 若未有存储记录，则为首次运行，仅存储
-    updateKV(list)
+    await updateKV(list)
     return
   }
   const latest = filterNewMessages(list, last)
@@ -163,5 +163,5 @@ export async function onScheduled(_env: Env) {
   }
   await pushMessagesToDiscord(latest, env.DISCORD_WEBHOOK, true)
   console.log(`Sent ${latest.length} new messages.`)
-  updateKV(list)
+  await updateKV(list)
 }
