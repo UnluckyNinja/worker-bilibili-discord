@@ -18,7 +18,8 @@ npm i
 npx wrangler login
 ```
 
-然后修改`wrangler.toml`中的name为你想要的名称，会显示在Cloudflare的Dashboard中。并把KV namespace ID为你自己的，直接去Dashboard创建即可，preview_id 为 dev 模式下使用可删除
+然后修改`wrangler.toml`中的`name`，作为Cloudflare控制台中的项目名。
+接着修改`[[kv_namespaces]]`中的`id`，直接去Cloudflare的控制台创建KV空间即可，创建后复制id并粘贴，此处preview_id 为本地 dev 模式下使用，如果不准备自己调试代码可直接删除
 
 如果不要求每分钟爬取，可修改`crons`为想要的模式，例如`"*/15 * * * *"`，是15分钟一次，详细设置请查阅官方文档
 
