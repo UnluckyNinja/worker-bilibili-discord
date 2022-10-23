@@ -17,9 +17,26 @@ npm i
 ```bash
 npx wrangler login
 ```
+然后修改`wrangler.toml`
+```toml
+name = "worker-bilibili-discord"
+main = "src/index.ts"
+compatibility_date = "2022-09-25"
 
-然后修改`wrangler.toml`中的`name`，作为Cloudflare控制台中的项目名。
-接着修改`[[kv_namespaces]]`中的`id`，直接去Cloudflare的控制台创建KV空间即可，创建后复制id并粘贴，此处preview_id 为本地 dev 模式下使用，如果不准备自己调试代码可直接删除
+[[kv_namespaces]]
+binding = "KV"
+id = "795fae2b23434581b8ac882f8832dc45"
+# preview_id = "bf50af9272b549dd8c7e3acb47fd41a3"
+
+[triggers]
+crons = ["* * * * *"]
+```
+其中`name`是Cloudflare控制台中的项目名，和github repo一样起名即可。  
+
+接着修改`[[kv_namespaces]]`中的`id`，是Cloudflare KV namespace服务的ID，  
+打开Cloudflare控制台，选择左边Worker分类下的KV手动创建一个，创建后复制id并粘贴替换，  
+
+此处`preview_id` 为本地 dev 模式下使用，如果不准备自己本地调试代码可直接删除
 
 如果不要求每分钟爬取，可修改`crons`为想要的模式，例如`"*/15 * * * *"`，是15分钟一次，详细设置请查阅官方文档
 
@@ -34,9 +51,9 @@ export const SETTINGS = {
 }
 ```
 其中：
-- `423895` 可以修改为所要爬取的B站用户ID，例如 https://space.bilibili.com/123456 末尾的数字 123456
+- `423895`: 可以修改为所要爬取的B站用户ID，例如 https://space.bilibili.com/123456 末尾的数字 123456
 
-- `['709421435382267915']` 是推送到discord时想要at的角色ID数组，在discord客户端设置中开启开发者模式（设置->高级->开发者模式），再打开角色组管理列表，点击三个点按钮，复制ID
+- `['709421435382267915']`: 推送到discord时想要at的角色ID数组，在discord客户端设置中开启开发者模式（设置->高级->开发者模式），再打开角色组管理列表，点击三个点按钮，复制ID
 
 ### 创建Webhook
 打开Discord中任一文字频道的设置，选择集成/Integrations -> Webhooks -> New Webhook，自行设置头像名称和频道，然后点击复制Webhook URL
@@ -52,7 +69,7 @@ npx wrangler secret put DISCORD_WEBHOOK
 npx wrangler publish
 ```
 ### 添加调试 Token
-若想启用调试功能，需要设置Token，与DISCORD_WEBHOOK相同属于环境变量，作为URL路由参数，
+若想启用调试功能，需要设置Token，与DISCORD_WEBHOOK相同属于环境变量，作为URL路由参数，  
 可以是符合条件的任意字符串，建议使用sha256sum一类hash功能，生产随机字符串，复制
 
 打开命令行，输入
