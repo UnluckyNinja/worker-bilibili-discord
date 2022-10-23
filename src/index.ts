@@ -46,6 +46,8 @@ export default {
     if (!TOKEN) return new Response('Token not set. Server functions is disabled.');
 
     const router = Router({ base: `/${TOKEN}` });
+    
+    // 调试功能
     router
       .get('/__test_fetch/:id', async ({params}) => Response.json(await fetchMessageList(params!.id)))
       // .get('/__test_env', async () => Response.json(env)) // 仅用于调试，数据敏感，生产环境务必删除或注释掉

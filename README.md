@@ -64,12 +64,13 @@ npx wrangler secret put TOKEN
 npx wrangler publish
 ```
 
-
 大功告成，坐等第一时间收到更新提醒吧
 
 ## 部署后调试
 
-- `/:TOKEN/__test_fetch/:id`: TOKEN为上文设置的环境变量，id是用户ID
+- `/:TOKEN/__test_fetch/:id`: TOKEN为上文设置的环境变量，id是B站用户ID，测试通过B站API获取用户数据是否正常
+- `/:TOKEN/__test_kv/:id`: TOKEN为上文设置的环境变量，id是B站用户ID，测试KV调用是否正常
+- `/:TOKEN/__test_discord/:id`: TOKEN为上文设置的环境变量，id是B站用户ID，测试Discord推送功能是否正常（测试时不会使用at功能）
 
 ## 注意
 Worker KV的免费tier quota是读取10万次每日，写入1000次每日，最多有3个cron trigger，帐号下所有项目共享
