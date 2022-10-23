@@ -40,12 +40,12 @@ export type MessageInfo = MessageInfoBase & MessageInfoType
 
 const MESSAGE_API = 'https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space'
 
-export async function fetchMessageList(): Promise<MessageInfo[]> {
+export async function fetchMessageList(userID: string): Promise<MessageInfo[]> {
   const target = new URL(MESSAGE_API)
 
   target.search = new URLSearchParams({
     offset: '',
-    host_mid: SETTINGS.bilibili_id, // 在 src/user.config.ts 中修改
+    host_mid: userID, // SETTINGS.bilibili_id, // 在 src/user.config.ts 中修改
     timezone_offset: '',
   }).toString()
 
@@ -142,15 +142,14 @@ export function filterNewMessages(list: MessageInfo[], last: MessageInfo[]): Mes
   return filtered
 }
 
-export async function onScheduled(_env: Env) {
-  env = _env
-
+async function processSingleUser(userID: string, roles: string[]){
+  const KV_KEY = `feed_${userID}`
   const updateKV = async (list: MessageInfo[]) => {
-    await env.KV.put('feed', JSON.stringify(list))
+    await env.KV.put(KV_KEY, JSON.stringify(list))
   }
 
-  const list = await fetchMessageList()
-  const last = await env.KV.get<MessageInfo[]>('feed', 'json')
+  const list = await fetchMessageList(userID)
+  const last = await env.KV.get<MessageInfo[]>(KV_KEY, 'json')
   if (!last) {
     // 若未有存储记录，则为首次运行，仅存储
     await updateKV(list)
@@ -161,7 +160,16 @@ export async function onScheduled(_env: Env) {
     // 无新消息
     return
   }
-  await pushMessagesToDiscord(latest, env.DISCORD_WEBHOOK, true)
+  await pushMessagesToDiscord(latest, env.DISCORD_WEBHOOK, roles ?? [])
   console.log(`Sent ${latest.length} new messages.`)
   await updateKV(list)
+}
+
+export async function onScheduled(_env: Env) {
+  env = _env
+  const subs = SETTINGS.subscriptions
+  
+  for (const [id, roles] of Object.entries(subs)){
+    await processSingleUser(id, roles)
+  }
 }

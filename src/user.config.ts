@@ -1,4 +1,6 @@
 export const SETTINGS = {
-  bilibili_id: '423895',
-  roles: ['709421435382267915'],
+  subscriptions: {
+    '423895': ['709421435382267915'],
+    // '123456': [],
+  }, 
 }

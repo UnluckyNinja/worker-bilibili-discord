@@ -18,6 +18,7 @@ export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
   KV: KVNamespace;
   DISCORD_WEBHOOK: string;
+  TOKEN: string;
   //
   // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
   // MY_DURABLE_OBJECT: DurableObjectNamespace;
@@ -34,27 +35,31 @@ export default {
   ): Promise<void> {
     ctx.waitUntil(onScheduled(env))
   },
-// 仅用于调试，数据敏感，生产环境务必删除或注释掉
-  // async fetch(
-  //   request: Request,
-  //   env: Env,
-  //   ctx: ExecutionContext
-  // ): Promise<Response> {
-  //   const router = Router();
-  //   router
-  //     .get('/__test_fetch', async () => Response.json(await fetchMessageList()))
-  //     .get('/__test_env', async () => Response.json(env))
-  //     .get('/__test_kv', async () => {
-  //       const list = JSON.stringify(await fetchMessageList())
-  //       await env.KV.put('feed', list)
-  //       const value = await env.KV.get<MessageInfo[]>('feed', 'json')
-  //       return Response.json(list+'\n'+value)
-  //     })
-  //     .get('/__test_discord', async () => {
-  //       const list = await fetchMessageList()
-  //       await pushMessagesToDiscord(list, env.DISCORD_WEBHOOK, false)
-  //       return new Response('Sent. ')
-  //     })
-  //   return router.handle(request)
-  // },
-};
+
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext
+  ): Promise<Response> {
+    const { TOKEN } = env
+    // 若服务器未设定token则关闭调试功能
+    if (!TOKEN) return new Response('Token not set. Server functions is disabled.');
+
+    const router = Router({ base: `/${TOKEN}` });
+    router
+      .get('/__test_fetch/:id', async ({params}) => Response.json(await fetchMessageList(params!.id)))
+      // .get('/__test_env', async () => Response.json(env)) // 仅用于调试，数据敏感，生产环境务必删除或注释掉
+      .get('/__test_kv/:id', async ({params}) => {
+        const list = JSON.stringify(await fetchMessageList(params!.id))
+        await env.KV.put('feed', list)
+        const value = await env.KV.get<MessageInfo[]>('feed', 'json')
+        return Response.json(list+'\n'+value)
+      })
+      .get('/__test_discord/:id', async ({params}) => {
+        const list = await fetchMessageList(params!.id)
+        await pushMessagesToDiscord(list, env.DISCORD_WEBHOOK, [])
+        return new Response('Sent. ')
+      })
+    return router.handle(request)
+  },
+}

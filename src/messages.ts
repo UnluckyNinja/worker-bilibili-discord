@@ -57,7 +57,7 @@ export function buildMessage(message: MessageInfo): EmbedObject {
 }
 
 // https://discord.com/developers/docs/resources/webhook#execute-webhook
-export async function pushMessagesToDiscord(messages: MessageInfo[], webhooks: string, atRoles: boolean = false) {
+export async function pushMessagesToDiscord(messages: MessageInfo[], webhooks: string, atRoles: string[] = []) {
   const list = webhooks.split(',')
   const embeds = messages.slice(0, 10).map(it=> buildMessage(it)).reverse() // Discord消息时间序是下为新
   const payload: WebhookPayload = {
@@ -67,8 +67,8 @@ export async function pushMessagesToDiscord(messages: MessageInfo[], webhooks: s
     }
   }
 
-  if (atRoles) {
-    payload.content = SETTINGS.roles.map(it=>`<@&${it}>`).join('')
+  if (atRoles && atRoles.length > 0) {
+    payload.content = atRoles.map(it=>`<@&${it}>`).join('')
     payload.allowed_mentions = {
       parse: ['roles']
     }
