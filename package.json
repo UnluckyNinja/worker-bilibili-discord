@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "wrangler dev -e dev",
     "remote": "wrangler dev --remote -e dev",
-    "publish": "wrangler deploy"
+    "wdeploy": "wrangler deploy"
   },
   "dependencies": {
     "discord-interactions": "^3.4.0",
