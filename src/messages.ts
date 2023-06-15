@@ -1,6 +1,5 @@
 import { EmbedObject, WebhookPayload } from './discord';
 import { MessageInfo } from './triggers';
-import { SETTINGS } from './user.config';
 
 // https://birdie0.github.io/discord-webhooks-guide/structure/embeds.html
 export function buildMessage(message: MessageInfo): EmbedObject {
@@ -57,7 +56,7 @@ export function buildMessage(message: MessageInfo): EmbedObject {
 }
 
 // https://discord.com/developers/docs/resources/webhook#execute-webhook
-export async function pushMessagesToDiscord(messages: MessageInfo[], webhooks: string, atRoles: string[] = []) {
+export async function pushMessagesToDiscord(messages: MessageInfo[], webhooks: string, atRoles: readonly string[] = []) {
   const list = webhooks.split(',')
   const embeds = messages.slice(0, 10).map(it=> buildMessage(it)).reverse() // Discord消息时间序是下为新
   const payload: WebhookPayload = {

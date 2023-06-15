@@ -145,7 +145,7 @@ export function filterNewMessages(list: MessageInfo[], last: MessageInfo[]): Mes
   return filtered
 }
 
-async function processSingleUser(userID: string, roles: string[]){
+async function processSingleUser(userID: string, webhook: string, roles: readonly string[]){
   const KV_KEY = `feed_${userID}`
   const updateKV = async (list: MessageInfo[]) => {
     await env.KV.put(KV_KEY, JSON.stringify(list))
@@ -163,7 +163,7 @@ async function processSingleUser(userID: string, roles: string[]){
     // 无新消息
     return
   }
-  await pushMessagesToDiscord(latest, env.DISCORD_WEBHOOK, roles ?? [])
+  await pushMessagesToDiscord(latest, webhook, roles ?? [])
   console.log(`Sent ${latest.length} new messages.`)
   await updateKV(list)
 }
@@ -172,7 +172,12 @@ export async function onScheduled(_env: Env) {
   env = _env
   const subs = SETTINGS.subscriptions
   
-  for (const [id, roles] of Object.entries(subs)){
-    await processSingleUser(id, roles)
+  for (const [id, options] of Object.entries(subs)){
+    for(let key of options.webhookKeys){
+      const webhook = await env.KV.get(key)
+      if(!webhook)
+        continue
+      await processSingleUser(id, webhook, options.roles[key])
+    }
   }
 }

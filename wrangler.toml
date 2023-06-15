@@ -1,6 +1,6 @@
 name = "worker-bilibili-discord"
 main = "src/index.ts"
-compatibility_date = "2022-09-25"
+compatibility_date = "2023-06-15"
 
 [[kv_namespaces]]
 binding = "KV"
