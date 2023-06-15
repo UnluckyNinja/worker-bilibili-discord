@@ -148,11 +148,11 @@ export function filterNewMessages(list: MessageInfo[], last: MessageInfo[]): Mes
 async function processSingleUser(userID: string, webhook: string, roles: readonly string[]){
   const KV_KEY = `feed_${userID}`
   const updateKV = async (list: MessageInfo[]) => {
-    await env.KV.put(KV_KEY, JSON.stringify(list))
+    await env.FEED_CACHE.put(KV_KEY, JSON.stringify(list))
   }
 
   const list = await fetchMessageList(userID)
-  const last = await env.KV.get<MessageInfo[]>(KV_KEY, 'json')
+  const last = await env.FEED_CACHE.get<MessageInfo[]>(KV_KEY, 'json')
   if (!last) {
     // 若未有存储记录，则为首次运行，仅存储
     await updateKV(list)
@@ -174,7 +174,7 @@ export async function onScheduled(_env: Env) {
   
   for (const [id, options] of Object.entries(subs)){
     for(let key of options.webhookKeys){
-      const webhook = await env.KV.get(key)
+      const webhook = await env.WEBHOOKS.get(key)
       if(!webhook)
         continue
       await processSingleUser(id, webhook, options.roles[key])

@@ -16,7 +16,8 @@ import { fetchMessageList, MessageInfo, onScheduled } from './triggers';
 
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-  KV: KVNamespace;
+  FEED_CACHE: KVNamespace;
+  WEBHOOKS: KVNamespace;
   TOKEN: string;
   //
   // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
@@ -52,19 +53,23 @@ export default {
       // .get('/__test_env', async () => Response.json(env)) // 仅用于调试，数据敏感，生产环境务必删除或注释掉
       .get('/__test_kv/:id', async ({params}) => {
         const list = JSON.stringify(await fetchMessageList(params!.id))
-        await env.KV.put('feed_test', list)
-        const value = await env.KV.get<MessageInfo[]>('feed_test', 'json')
+        await env.FEED_CACHE.put('feed_test', list)
+        const value = await env.FEED_CACHE.get<MessageInfo[]>('feed_test', 'json')
         return Response.json(list+'\n'+value)
       })
       .get('/__test_discord/:id', async ({params, query}) => {
         const list = await fetchMessageList(params!.id)
-        const webhook_kv = query?.webhook_kv
-        if(!webhook_kv) return new Response('You need to add webhook KV Key to queries.')
-        const webhook = await env.KV.get(webhook_kv)
-        if(!webhook) return new Response('You need to set a webhook url for this key in KV.')
+        const webhook_kv = query?.webhook_kv as string
+        if(!webhook_kv) return new Response('You need to add webhook KV Key to queries: ')
+        const webhook = await env.WEBHOOKS.get(webhook_kv)
+        if(!webhook) return new Response('You need to set a webhook url for this key in KV: '+webhook_kv+' \nCurrent: '+ webhook)
         await pushMessagesToDiscord(list, webhook, [])
         return new Response('Sent. ')
       })
-    return router.handle(request)
+      .get('/__test_webhooks', async ({params}) => {
+        const webhooks = await env.WEBHOOKS.list()
+        return new Response(`list:\n${webhooks.keys.join('\n')}`)
+      })
+    return router.handle(request).catch(() => new Response('Not supported.'))
   },
 }
