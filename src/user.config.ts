@@ -1,10 +1,13 @@
 export const SETTINGS = {
   subscriptions: {
     '423895': {
-      webhookKeys: ['WEBHOOK_PRIVATE', 'WEBHOOK_FUTURETECH'],
+      webhookKeys: [
+        'WEBHOOK_FUTURETECH',
+        'WEBHOOK_PRIVATE',
+      ],
       roles: {
+        WEBHOOK_FUTURETECH: ['1118733545897197589'],
         WEBHOOK_PRIVATE: ['709421435382267915'],
-        WEBHOOK_FUTURETECH: ['1118733545897197589']
       }
     },
     // '123456': [],

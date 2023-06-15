@@ -145,7 +145,7 @@ export function filterNewMessages(list: MessageInfo[], last: MessageInfo[]): Mes
   return filtered
 }
 
-async function processSingleUser(userID: string, webhook: string, roles: readonly string[]){
+async function processSingleUser(userID: string, webhooks: readonly string[], roles: { readonly [k in typeof webhooks[number]]: readonly string[] }, force = false){
   const KV_KEY = `feed_${userID}`
   const updateKV = async (list: MessageInfo[]) => {
     await env.FEED_CACHE.put(KV_KEY, JSON.stringify(list))
@@ -158,12 +158,21 @@ async function processSingleUser(userID: string, webhook: string, roles: readonl
     await updateKV(list)
     return
   }
-  const latest = filterNewMessages(list, last)
+  let latest = filterNewMessages(list, last)
   if (latest.length < 1) {
     // 无新消息
-    return
+    if(!force) return
+    latest = [list[0]]
   }
-  await pushMessagesToDiscord(latest, webhook, roles ?? [])
+  // 遍历选项
+  for (let key of webhooks){
+    const webhook = await env.WEBHOOKS.get(key)
+    if(!webhook){
+      console.log(`No webhook url for key: ${key} in the KV, skipped it for ${userID}`)
+      continue
+    }
+    await pushMessagesToDiscord(latest, webhook, roles[webhook] ?? [])
+  }
   console.log(`Sent ${latest.length} new messages.`)
   await updateKV(list)
 }
@@ -173,11 +182,6 @@ export async function onScheduled(_env: Env) {
   const subs = SETTINGS.subscriptions
   
   for (const [id, options] of Object.entries(subs)){
-    for(let key of options.webhookKeys){
-      const webhook = await env.WEBHOOKS.get(key)
-      if(!webhook)
-        continue
-      await processSingleUser(id, webhook, options.roles[key])
-    }
+    await processSingleUser(id, options.webhookKeys, options.roles)
   }
 }

@@ -66,9 +66,16 @@ export default {
         await pushMessagesToDiscord(list, webhook, [])
         return new Response('Sent. ')
       })
-      .get('/__test_webhooks', async ({params}) => {
-        const webhooks = await env.WEBHOOKS.list()
-        return new Response(`list:\n${webhooks.keys.join('\n')}`)
+      .get('/__test_ping/:id', async ({params, query}) => {
+        const list = await fetchMessageList(params!.id)
+        const webhook_kv = query?.webhook_kv as string
+        if(!webhook_kv) return new Response('You need to add webhook KV Key to queries. ')
+        const webhook = await env.WEBHOOKS.get(webhook_kv)
+        if(!webhook) return new Response('You need to set a webhook url for this key in KV: '+webhook_kv+' \nCurrent: '+ webhook)
+        const role = query?.role as string
+        if(!role) return new Response('You need to add a role id to queries. ')
+        await pushMessagesToDiscord([list[0]], webhook, [role])
+        return new Response('Sent. ')
       })
     return router.handle(request).catch(() => new Response('Not supported.'))
   },
