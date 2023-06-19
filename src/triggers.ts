@@ -171,7 +171,7 @@ async function processSingleUser(userID: string, webhooks: readonly string[], ro
       console.log(`No webhook url for key: ${key} in the KV, skipped it for ${userID}`)
       continue
     }
-    await pushMessagesToDiscord(latest, webhook, roles[webhook] ?? [])
+    await pushMessagesToDiscord(latest, webhook, roles[key] ?? [])
   }
   console.log(`Sent ${latest.length} new messages.`)
   await updateKV(list)
