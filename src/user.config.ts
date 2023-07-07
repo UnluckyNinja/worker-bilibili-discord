@@ -8,6 +8,9 @@ export const SETTINGS = {
       roles: {
         WEBHOOK_FUTURETECH: ['1118733545897197589'],
         WEBHOOK_PRIVATE: ['709421435382267915'],
+      },
+      webhookOnError: { // TODO
+        WEBHOOK_FUTURETECH: 'WEBHOOK_FUTURETECH_ERROR',
       }
     },
     // '123456': [],

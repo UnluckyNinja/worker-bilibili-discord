@@ -52,9 +52,9 @@ export async function fetchMessageList(userID: string): Promise<MessageInfo[]> {
   const response = await fetch(target.toString(), {
     headers: {
       Accept: 'application/json',
-      Cookie: `DedeUserID=${userID};`,
+      Cookie: `SESSDATA=plz_give_fans_a_simple_way_to_pull_latest_feed_bilibili.com`,
       Origin: 'space.bilibili.com',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.43'
+      'User-Agent': 'Mozilla/5.0'
     },
     method: 'GET',
   })
