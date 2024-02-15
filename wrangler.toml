@@ -13,7 +13,7 @@ id = "012e1742cb764de1a580211b717255c6"
 preview_id = "8d6303994acc4a438877878cb8ac6529"
 
 [triggers]
-crons = ["* * * * *"]
+crons = ["*/5 * * * *"]
 
 [[env.dev.kv_namespaces]]
 binding = "FEED_CACHE"
