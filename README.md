@@ -2,6 +2,9 @@
 
 部署在Cloudflare Worker上，定时抓取特定用户的B站动态并推送到Discord中
 
+**因B站激进反爬，不想与其玩猫鼠游戏，目前B站投稿监控功能不可用**  
+参见 [SocialSisterYi/bilibili-API-collect/issues/686](https://github.com/SocialSisterYi/bilibili-API-collect/issues/686)  
+以及 [SocialSisterYi/bilibili-API-collect/issues/868](https://github.com/SocialSisterYi/bilibili-API-collect/issues/868)  
 ## 安装
 
 确保你已经安装了node环境以及npm等包管理器（https://nodejs.org/en）
